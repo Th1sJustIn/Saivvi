@@ -1,23 +1,27 @@
+///   Justin Marshall
+///   10/24/24
+///   Hashtag Generator
+
 "use client"
-import Image from "next/image";
-import loadingImg from "./public/loading.png";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useState } from "react";
 import OpenAI from "openai";
 import {config} from 'dotenv';
-import { load } from "langchain/load";
 
-config({ path: '/hashtag-generator/.env' });
+config({ path: '/hashtag-generator/.env' });  //set .env path 
 
 
 export default function Home() {
+  
+  //set useState variables
   const [currentSection, setCurrentSection] = useState(0); 
-  const [q1, setq1] = useState('');
-  const [q2, setq2] = useState('');
-  const [q3, setq3] = useState('');
+  const [q1, setq1] = useState('');   //Qustion 1
+  const [q2, setq2] = useState('');   //Qustion 2
+  const [q3, setq3] = useState('');   //Qustion 3
   const [hashtags, setHashtags] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);  
 
 
+  // These handle functions ensure question answers are up to date with the input box
   const handleQ1 = (event: { target: { value: SetStateAction<string>; }; }) => {
     setq1(event.target.value);
   };
@@ -28,6 +32,9 @@ export default function Home() {
     setq3(event.target.value);
   };
 
+
+
+  /// Change section to navigate to individual quesitons
   const nextSection = () => {
     if (currentSection < 2) {
       setCurrentSection(currentSection + 1);
@@ -43,7 +50,7 @@ export default function Home() {
 
 
 
-    const chatAPI = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+    const chatAPI = process.env.NEXT_PUBLIC_OPENAI_API_KEY  //save key from .env file
     if (!chatAPI) {
       throw new Error("The NEXT_PUBLIC_OPENAI_API_KEY environment variable is missing or empty.");
     }
@@ -53,42 +60,54 @@ export default function Home() {
     });
 
 
+
+    // generate hashtags 
     const generateHashtag = async () => {
-      let hashes = ""
+      let hashes = "";
+
+      // if any of the question inputs are empty then an error message is sent to the hashtags variable
       if (q1.trim() === '' || q2.trim() === '' || q3.trim() === '') {
           setHashtags("Error: Please fill out all the fields")
-          return;
+          return; // end function 
       }
-      setLoading(true)
+      setLoading(true); //shows loading image
 
+
+    
       try{
+      // request to OpenAI. It includes prompting instrutions and adds in the inputs from the three fields
       const chatCompletion = await client.chat.completions.create({
         messages: [{ role: 'user', content: "your a bot that creates hashtags for social media posts. using the questions and answers below, give me a list of 5 hashtags separated by a comma: What is the main topic or theme of your video? " + q1 + "Who is your target audience? "+ q2 +" What niche does your video primarily target? " + q3 }],
         model: 'gpt-3.5-turbo',
       });
 
-      hashes = String(chatCompletion.choices[0].message.content)
+      hashes = String(chatCompletion.choices[0].message.content);
     }
   
       catch(error){
-        console.error("Error generating hashtags")
+        console.error("Error generating hashtags");
       }finally{
-        setLoading(false)
-        setHashtags(hashes)
+        setLoading(false);   // hides loading image 
+        setHashtags(hashes);
 
       }
 
       
       };
 
+
+      // This function displays whatever is in the hashtags variable
       const showHashtags = () => {
         if (hashtags !== ""){
         return (<div className="text-3xl border-4 border-secondary rounded-xl p-10">{hashtags}</div>)
         }
-      }
+      };
     
 
   return (
+
+    // UI Layout Below
+
     <div className="text-white  bg-primary bg-cover bg-center text-center flex flex-col pt-20 items-center ">
     <h1 className="text-white text-6xl font-bold ">Welcome to the <span className="text-color1">Hashtag Generator! </span> 🎉</h1>
     <h2 className=" border-4 border-secondary font-bold mx-20 md:mx-40 lg:mx-80 mt-10 p-10 text-xl rounded-2xl mb-20 ">Want to <span className="text-color2  bold">boost your social media presence?</span> Our tool creates effective hashtags to enhance your visibility and engagement. Let's get started!</h2>
@@ -162,6 +181,8 @@ export default function Home() {
       </div>
     </div>
 
+
+    {/* If loading == true, then show the loading image div  */}
     {loading && <div className="loadingImage"></div>}
       
     
