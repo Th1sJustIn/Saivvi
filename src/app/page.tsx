@@ -1,13 +1,21 @@
 "use client"
 import Image from "next/image";
-import { SetStateAction, useState } from "react";
+import loadingImg from "./public/loading.png";
+import { SetStateAction, useEffect, useState } from "react";
+import OpenAI from "openai";
+import {config} from 'dotenv';
+import { load } from "langchain/load";
+
+config({ path: '/hashtag-generator/.env' });
+
 
 export default function Home() {
   const [currentSection, setCurrentSection] = useState(0); 
-  const [answer, setAnswer] = useState(false)
   const [q1, setq1] = useState('');
   const [q2, setq2] = useState('');
   const [q3, setq3] = useState('');
+  const [hashtags, setHashtags] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
   const handleQ1 = (event: { target: { value: SetStateAction<string>; }; }) => {
@@ -27,19 +35,63 @@ export default function Home() {
   };
 
   const prevSection = () => {
-    if (currentSection > 0) {
+    if (currentSection > 0) { 
       setCurrentSection(currentSection - 1);
     }
   };
 
-  const Generate = () =>{
-    setAnswer(true)
-  }
+
+
+
+    const chatAPI = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+    if (!chatAPI) {
+      throw new Error("The NEXT_PUBLIC_OPENAI_API_KEY environment variable is missing or empty.");
+    }
+
+    const client = new OpenAI({
+      apiKey:chatAPI, dangerouslyAllowBrowser:true
+    });
+
+
+    const generateHashtag = async () => {
+      let hashes = ""
+      if (q1.trim() === '' || q2.trim() === '' || q3.trim() === '') {
+          setHashtags("Error: Please fill out all the fields")
+          return;
+      }
+      setLoading(true)
+
+      try{
+      const chatCompletion = await client.chat.completions.create({
+        messages: [{ role: 'user', content: "your a bot that creates hashtags for social media posts. using the questions and answers below, give me a list of 5 hashtags separated by a comma: What is the main topic or theme of your video? " + q1 + "Who is your target audience? "+ q2 +" What niche does your video primarily target? " + q3 }],
+        model: 'gpt-3.5-turbo',
+      });
+
+      hashes = String(chatCompletion.choices[0].message.content)
+    }
+  
+      catch(error){
+        console.error("Error generating hashtags")
+      }finally{
+        setLoading(false)
+        setHashtags(hashes)
+
+      }
+
+      
+      };
+
+      const showHashtags = () => {
+        if (hashtags !== ""){
+        return (<div className="text-3xl border-4 border-secondary rounded-xl p-10">{hashtags}</div>)
+        }
+      }
+    
 
   return (
-    <div className="text-white  bg-primary bg-cover bg-center text-center flex flex-col pt-20 items-center h-screen ">
+    <div className="text-white  bg-primary bg-cover bg-center text-center flex flex-col pt-20 items-center ">
     <h1 className="text-white text-6xl font-bold ">Welcome to the <span className="text-color1">Hashtag Generator! </span> 🎉</h1>
-    <h2 className=" border-4 border-secondary font-bold mx-20 md:mx-40 lg:mx-80 mt-10 py-10 text-xl rounded-2xl mb-20 ">Want to <span className="text-color2  bold">boost your social media presence?</span> Our tool creates effective hashtags to enhance your visibility and engagement. Let's get started!</h2>
+    <h2 className=" border-4 border-secondary font-bold mx-20 md:mx-40 lg:mx-80 mt-10 p-10 text-xl rounded-2xl mb-20 ">Want to <span className="text-color2  bold">boost your social media presence?</span> Our tool creates effective hashtags to enhance your visibility and engagement. Let's get started!</h2>
   {/* <div className=" px-10 mx-10 w-screen h-80 mt-10 flex flex-row justify-around items-center text-lg font-bold flex-wrap md:flex-nowrap">
 
     <div className="bg-secondary h-60 w-80 rounded-md mx-10 flex justify-center items-center mb-10"><p className="px-10">Use a mix of <span className="text-color1">popular and niche hashtags</span> for the best reach.</p></div>
@@ -92,7 +144,7 @@ export default function Home() {
       )}
 
       {/* Navigation buttons */}
-      <div className="mb-40 h-s">
+      <div className="mb-20 h-s">
         {currentSection > 0 && (
           <button onClick={prevSection} className="mr-4 text-white bg-secondary hover:bg-color1 rounded px-4 py-2">
             Previous
@@ -103,20 +155,18 @@ export default function Home() {
             Next
           </button>
         ) : (
-          <button onClick={Generate} className="text-white bg-color2 hover:bg-color1 rounded px-4 py-2">
+          <button onClick={generateHashtag}className="text-white bg-color2 hover:bg-color1 rounded px-4 py-2">
             Generate
           </button>
         )}
       </div>
     </div>
+
+    {loading && <div className="loadingImage"></div>}
       
-      {answer && (
-        <div>
-          <p>{q1}</p>
-          <p>{q2}</p>
-          <p>{q3}</p>
-        </div>
-      )}
+    
+      
+      <div className="mb-40">{showHashtags()}</div>
 
   </div>
   );
