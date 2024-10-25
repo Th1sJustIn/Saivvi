@@ -1,101 +1,123 @@
+"use client"
 import Image from "next/image";
+import { SetStateAction, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [currentSection, setCurrentSection] = useState(0); 
+  const [answer, setAnswer] = useState(false)
+  const [q1, setq1] = useState('');
+  const [q2, setq2] = useState('');
+  const [q3, setq3] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+
+  const handleQ1 = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setq1(event.target.value);
+  };
+  const handleQ2 = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setq2(event.target.value);
+  };
+  const handleQ3 = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setq3(event.target.value);
+  };
+
+  const nextSection = () => {
+    if (currentSection < 2) {
+      setCurrentSection(currentSection + 1);
+    }
+  };
+
+  const prevSection = () => {
+    if (currentSection > 0) {
+      setCurrentSection(currentSection - 1);
+    }
+  };
+
+  const Generate = () =>{
+    setAnswer(true)
+  }
+
+  return (
+    <div className="text-white  bg-primary bg-cover bg-center text-center flex flex-col pt-20 items-center h-screen ">
+    <h1 className="text-white text-6xl font-bold ">Welcome to the <span className="text-color1">Hashtag Generator! </span> 🎉</h1>
+    <h2 className=" border-4 border-secondary font-bold mx-20 md:mx-40 lg:mx-80 mt-10 py-10 text-xl rounded-2xl mb-20 ">Want to <span className="text-color2  bold">boost your social media presence?</span> Our tool creates effective hashtags to enhance your visibility and engagement. Let's get started!</h2>
+  {/* <div className=" px-10 mx-10 w-screen h-80 mt-10 flex flex-row justify-around items-center text-lg font-bold flex-wrap md:flex-nowrap">
+
+    <div className="bg-secondary h-60 w-80 rounded-md mx-10 flex justify-center items-center mb-10"><p className="px-10">Use a mix of <span className="text-color1">popular and niche hashtags</span> for the best reach.</p></div>
+    <div className="bg-secondary h-60 w-80  rounded-md mx-10 flex justify-center items-center mb-10"><p className="px-10">Avoid overly long hashtags; keep them <span className="text-color1">short and memorable.</span></p></div>
+    <div className="bg-secondary h-60 w-80 rounded-md mx-10 flex justify-center items-center mb-10"><p className="px-10">Research <span className="text-color1">trending hashtags</span> in your category to stay relevant.</p></div>
+    <div className="bg-secondary h-60 w-80 rounded-md mx-10 flex justify-center items-center mb-10"><p className="px-10">Don’t overload your post; stick to around <span className="text-color1">5-10 hashtags</span> for optimal engagement.</p></div>
+
+  </div>
+   */}
+
+<div className="text-center mt-10">
+      {/* Display sections based on currentSection */}
+      {currentSection === 0 && (
+        <div>
+          <h2 className="text-white px-10 font-bold text-3xl">
+            What is the <span className="text-color1">main topic or theme</span> of your video?
+          </h2>
+          <input
+            type="text"
+            value={q1}
+            onChange={handleQ1}
+            className="mt-10 text-center text-black border-2 border-secondary rounded w-full max-w-2xl h-12 mb-10"
+            placeholder="Enter response here..."
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      )}
+      {currentSection === 1 && (
+        <div>
+          <h2 className="text-white px-10 font-bold text-3xl">Who is your <span className="text-color1">target audience?</span></h2>
+          <input
+            type="text"
+            value={q2}
+            onChange={handleQ2}
+            className="mt-10 text-center text-black border-2 border-secondary rounded w-full max-w-2xl h-12 mb-10"
+            placeholder="Enter response here..."
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+      )}
+      {currentSection === 2 && (
+        <div>
+        <h2 className="text-white font-bold px-10 text-3xl">What <span className="text-color1">niche</span> does your video primarily target?</h2>
+          <input
+            type="text"
+            value={q3}
+            onChange={handleQ3}
+            className="mt-10 text-center text-black border-2 border-secondary rounded w-full max-w-2xl h-12 mb-10"
+            placeholder="Enter response here..."
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      )}
+
+      {/* Navigation buttons */}
+      <div className="mb-40 h-s">
+        {currentSection > 0 && (
+          <button onClick={prevSection} className="mr-4 text-white bg-secondary hover:bg-color1 rounded px-4 py-2">
+            Previous
+          </button>
+        )}
+        {currentSection < 2 ? (
+          <button onClick={nextSection} className="text-white bg-secondary hover:bg-color1 rounded px-4 py-2">
+            Next
+          </button>
+        ) : (
+          <button onClick={Generate} className="text-white bg-color2 hover:bg-color1 rounded px-4 py-2">
+            Generate
+          </button>
+        )}
+      </div>
     </div>
+      
+      {answer && (
+        <div>
+          <p>{q1}</p>
+          <p>{q2}</p>
+          <p>{q3}</p>
+        </div>
+      )}
+
+  </div>
   );
 }
